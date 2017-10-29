@@ -25,7 +25,7 @@ if [ "${correct_time}" = "" ]; then
   exit 1
 fi
 if [ "$( borg list "${BORG_REPO}::${correct_time}" | \
-  egrep "${working_directory}" )" = "" ]; then
+  egrep "${working_directory}$" )" = "" ]; then
   info "The current directory does not exist as a back up"
   exit 1
 fi
