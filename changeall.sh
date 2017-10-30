@@ -9,18 +9,19 @@
 # requires: files names do not contain blank or special characters
 
 usage() {
-  printf "\n changeall [-r|-R] \"from-pattern\" \"to-pattern\" [directory]" 1>&2;
+  printf "changeall [-r|-R] \"from-pattern\" \"to-pattern\" [directory]\n" 1>&2;
   exit 1
 }
-max_depth="-maxdepth 0"
-directory=""
+max_depth="-maxdepth 1"
+directory="."
 case "${1}" in
   '-r' | '-R' )
     maxdepth=""
     shift ;;
 esac
-if [ \( $# -lt 2 \) -a \( $# -gt 3 \) ]; then
+if [ \( $# -lt 2 \) -o \( $# -gt 3 \) ]; then
   usage
+  exit 1
 elif [ $# -eq 3 ]; then
   directory="${3}"
   if [ ! \( \( -d "${directory}" \) -a \( -x "${directory}" \) \) ]; then
@@ -30,14 +31,16 @@ elif [ $# -eq 3 ]; then
 fi
 from_pattern="${1}"
 to_pattern="${2}"
-temp_file="$( mktemp . )"
-for index in $(find "${max_depth}" "${directory}" "*.{cc,cpp,C,h}"); do
-  helper=echo "${index}" | sed "s:"${from_pattern}":${to_pattern}:g" | egrep ".+"
+temp_file="$( mktemp -p . )"
+for index in $(find ${directory} ${max_depth} -name "*.C" -o -name "*.cpp" -name "*.h" -o -name "*.cc"); do
+  helper="$( echo "${index}" | sed -En "s:${from_pattern}:${to_pattern}:gp" | egrep ".+" )"
   if [ "${helper}" = "" ]; then
     continue
   fi
-  "${helper}" >> "${temp_file}"
+  echo "${helper}" >> "${temp_file}"
   mv "${index}" "${helper}"
 done
-$( cat "${temp_file}" | sort>&1 )
+echo "$( cat "${temp_file}" | sort>&1 )"
+rm "${temp_file}"
+exit 0
 
