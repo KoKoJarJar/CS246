@@ -16,7 +16,7 @@ max_depth="-maxdepth 1"
 directory="."
 case "${1}" in
   '-r' | '-R' )
-    maxdepth=""
+    max_depth=""
     shift ;;
 esac
 if [ \( $# -lt 2 \) -o \( $# -gt 3 \) ]; then
@@ -32,7 +32,7 @@ fi
 from_pattern="${1}"
 to_pattern="${2}"
 temp_file="$( mktemp -p . )"
-for index in $(find ${directory} ${max_depth} -name "*.C" -o -name "*.cpp" -name "*.h" -o -name "*.cc"); do
+for index in $( find ${directory} ${max_depth} -name "*.cpp" -o -name "*.C" -o -name "*.h" -o -name "*.cc" ); do
   helper="$( echo "${index}" | sed -En "s:${from_pattern}:${to_pattern}:gp" | egrep ".+" )"
   if [ "${helper}" = "" ]; then
     continue
@@ -40,7 +40,7 @@ for index in $(find ${directory} ${max_depth} -name "*.C" -o -name "*.cpp" -name
   echo "${helper}" >> "${temp_file}"
   mv "${index}" "${helper}"
 done
-echo "$( cat "${temp_file}" | sort>&1 )"
+cat "${temp_file}" | sort 
 rm "${temp_file}"
 exit 0
 
