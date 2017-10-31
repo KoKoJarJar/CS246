@@ -1,0 +1,1 @@
+regress program [-o option] [prefix file] [-p prefix-list]

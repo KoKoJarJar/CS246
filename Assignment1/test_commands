@@ -1,0 +1,6 @@
+./regress.sh cat -o -n file-list &> regress_test1.out
+./regress.sh cat -o -n file-list2 -p test4 test5 test6 &>regress_test2.out
+./regress.sh cat -o -n file-list2 -p test4 test5 test6 &>regress_test3.out
+./regress.sh cat &> regress_test4.out
+./regress.sh bloop -o -n file-list2 -p test4 test5 test6 &>regress_test5.out
+./regress.sh cat xd &> regress_test7.out

@@ -1,0 +1,14 @@
+identical output for prefix "test1"
+test2.out doesn't have read access or it doesn't exist
+test3.in doesn't have read access or it doesn't exist
+test4.in doesn't have read access or it doesn't exist
+test5.out doesn't have read access or it doesn't exist
+"test6":
+1,3c1,3
+<      1	a
+<      2	b
+<      3	c
+---
+> a
+> b
+> c
