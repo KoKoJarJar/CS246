@@ -33,14 +33,16 @@ from_pattern="${1}"
 to_pattern="${2}"
 temp_file="$( mktemp -p . )"
 for index in $( find ${directory} ${max_depth} -name "*.cpp" -o -name "*.C" -o -name "*.h" -o -name "*.cc" ); do
-  helper="$( echo "${index}" | sed -En "s:${from_pattern}:${to_pattern}:gp" | egrep ".+" )"
+  suffix="$( echo "${index}" | sed -E "s:(.*)(\..*):\2:" )"
+  prefix="$( echo "${index}" | sed -E "s:(.*)(\..*):\1:" )"
+  helper="$( echo "${prefix}" | sed -En "s:${from_pattern}:${to_pattern}:gp" | egrep ".+" )"
   if [ "${helper}" = "" ]; then
     continue
   fi
+  helper="${helper}${suffix}"
   echo "${helper}" >> "${temp_file}"
-  mv "${index}" "${helper}"
+  mv "${index}" "${helper}" 2>"/dev/null"
 done
 cat "${temp_file}" | sort 
 rm "${temp_file}"
 exit 0
-
