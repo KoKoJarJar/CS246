@@ -26,12 +26,8 @@ usage() {
 }
 program="${1}"
 shift
-if [ ! \( -x "${program}" -a -f "${program}" \) ]; then
-  echo "program ${1} cannot be run" 1>&2
-  exit 1
-fi
 while [ $# -gt 0 ]; do
-  case arg in
+  case ${1} in
     '-o' )
       shift
       opts="${1}" ;;
@@ -44,12 +40,12 @@ while [ $# -gt 0 ]; do
     * )
       shift
       prefix_file="${1}"
-      if [! \( -f ${prefix_file} -a -r ${prefix_file} \) ]; then
+      if [ ! \( -f ${prefix_file} -a -r ${prefix_file} \) ]; then
         echo "${prefix_file} doesn't have read access or it doesn't exist" 1>&2
       fi
-      shift
       prefix_list="$( sed -E "s:[[space]]+: :g" < "${prefix_file}" | tr '\n' ' ' )" ;;
   esac
+  shift
 done
 if [ ${prefix_list} = "" ]; then
   echo "No input files specified" 1>&2
@@ -75,7 +71,7 @@ for arg in ${prefix_list}; do
   if [ \( -r "${args_name}" -a -f "${args_name}" \) ]; then
     current_test_opts="$( sed -E "s:[[space]]+: :g" < "${args_name}" | tr '\n' ' ' )"
   fi
-  ${program} ${current_test_opts} < "${input_name}" 1>"${temp_file}" 2>"/dev/bull"
+  ${program} ${current_test_opts} < "${input_name}" 1>"${temp_file}" 2>"/dev/null"
   if [ ${?} -ne 0 ]; then
     echo "${program} could not process ${input_name}" 1>&2
     continue
