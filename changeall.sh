@@ -1,11 +1,14 @@
 #!/bin/bash
-# changeall [-r|-R] "from-pattern" "to-pattern" [directory]
-# changs all occurences of an arbitrary pattern "from-pattern"
+#
+# changes all occurences of an arbitrary pattern "from-pattern"
 # to pattern "to-pattern" on files .h/.C/.cpp/.cc and prints
 # the names of the changed files in sorted order
-# [-R|-r] represents the recursivity of the function and [directory]
-# is the targeted directory, if absent the script is called on the
-# working directory
+#
+# usage: changeall [-r|-R] "from-pattern" "to-pattern" [directory]
+# [-R|-r] represents the recursivity of the function 
+# [directory] is the targeted directory 
+# Examples: changeall -r "bla" "bloo"
+# Examples: changeall "([ab])([ab])." "\2\1x" .
 # requires: files names do not contain blank or special characters
 
 usage() {
@@ -21,7 +24,6 @@ case "${1}" in
 esac
 if [ \( $# -lt 2 \) -o \( $# -gt 3 \) ]; then
   usage
-  exit 1
 elif [ $# -eq 3 ]; then
   directory="${3}"
   if [ ! \( \( -d "${directory}" \) -a \( -x "${directory}" \) \) ]; then
