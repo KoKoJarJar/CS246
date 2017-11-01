@@ -30,7 +30,6 @@ if [ $# -eq 0 ]; then
   usage
 fi
 if [ "$(command -v "${program}" )" = "" ]; then
-  echo "Program not found or executable"
   usage
 fi
 while [ $# -gt 0 ]; do
