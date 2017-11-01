@@ -25,12 +25,12 @@ usage() {
   exit 1
 }
 program="${1}"
-if [ "$(command -v "${program}" )" = "" ]; then
-  echo "Program not found or executable"
-  usage
-fi
 shift
 if [ $# -eq 0 ]; then
+  usage
+fi
+if [ "$(command -v "${program}" )" = "" ]; then
+  echo "Program not found or executable"
   usage
 fi
 while [ $# -gt 0 ]; do
