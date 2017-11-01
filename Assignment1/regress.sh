@@ -25,6 +25,10 @@ usage() {
   exit 1
 }
 program="${1}"
+if [ "$(command -v "${program}" )" = "" ]; then
+  echo "Program not found or executable"
+  exit 1
+fi
 shift
 if [ $# -eq 0 ]; then
   usage
@@ -87,7 +91,7 @@ for arg in ${prefix_list}; do
   fi
   diff="$(diff "${temp_file}" "${output_name}")"
   if [ "${diff}" = "" ]; then
-    echo "identical output for prefix \"${arg}\""
+    echo "Identical output for prefix \"${arg}\""
   else
     echo "\"${arg}\":"
     echo "${diff}"
