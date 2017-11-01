@@ -27,7 +27,7 @@ usage() {
 program="${1}"
 if [ "$(command -v "${program}" )" = "" ]; then
   echo "Program not found or executable"
-  exit 1
+  usage
 fi
 shift
 if [ $# -eq 0 ]; then
@@ -62,7 +62,7 @@ while [ $# -gt 0 ]; do
 done
 if [ "${prefix_list}" = "" ]; then
   echo "No input files specified" 1>&2
-  exit 1
+  usage
 fi
 if [ $# -gt 0 ]; then
   usage
