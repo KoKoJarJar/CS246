@@ -1,0 +1,6 @@
+Without Optimization
+recursion: 7.596 7.780 7.496 7.730
+loop: 1.983 1.982 1.969 1.990 
+With -O2
+recursion: 4.637 4.782 4.774 4.772
+loop: 1.530 1.645 1.534 1.635

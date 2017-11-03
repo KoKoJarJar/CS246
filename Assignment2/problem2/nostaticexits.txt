@@ -1,0 +1,6 @@
+Without Optimization
+with flags: 13.01 13.09 13.84 13.39
+without flags: 5.7 6.11 5.58 5.60
+With -O2
+with flags: 3.81 3.79 3.90 3.79
+without flags: 2.86 2.84 2.84 2.83

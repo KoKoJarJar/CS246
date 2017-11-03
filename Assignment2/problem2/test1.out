@@ -1,0 +1,30 @@
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : S4 i:0 j:0 k:0 : S5 i:0 j:0 k:0 : S6 i:0 j:0 k:0 : S7 i:0 j:0
+S8 i:0
+
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : S4 i:0 j:0 k:0 : S5 i:0 j:0 k:0 : S7 i:0 j:0
+S8 i:0
+
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : S4 i:0 j:0 k:0 : S8 i:0
+
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : S4 i:0 j:0 k:0 : S8 i:0
+
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : 
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : 
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : 
+S1 i:0
+S2 i:0 j:0
+S3 i:0 j:0 k:0 : 
