@@ -7,7 +7,7 @@ void do_work(int C1, int C2, int C3, int L1, int L2, volatile int L3) {
   bool flag1 = false;
   int i = 0;
   while ((i < L1) & !flag1) {
-#ifndef NO_OUTPUT
+# git statusifndef NO_OUTPUT
     cout << "S1 i:" << i << endl;
 #endif
     bool flag2 = false;
@@ -51,7 +51,7 @@ void do_work(int C1, int C2, int C3, int L1, int L2, volatile int L3) {
 #endif
       }
       ++j;
-    } // wile
+    } // w
     if (!flag1) {
 #ifndef NO_OUTPUT
     cout << "S8 i:" << i << endl;
