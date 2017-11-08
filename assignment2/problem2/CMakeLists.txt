@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 2.9.4)
+project(test)
+include_directories(.)
+file(GLOB SOURCES "*.cpp")
+add_executable(pqueue ${SOURCES})
