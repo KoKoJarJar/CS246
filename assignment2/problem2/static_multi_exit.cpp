@@ -4,6 +4,7 @@ using namespace std;
 
 // volatile prevents dead-code removal
 void do_work(int C1, int C2, int C3, int L1, int L2, volatile int L3) {
+int lame;
   for (int i = 0; i < L1; ++i) {
 #ifndef NO_OUTPUT
     cout << "S1 i:" << i << endl;
@@ -68,6 +69,7 @@ int main(int argc, char *argv[]) {
           do_work(C1, C2, C3, L1, L2, L3);
 #ifndef NO_OUTPUT
           cout << endl;
+          int bla;
 #endif
         } // for
       } // for
