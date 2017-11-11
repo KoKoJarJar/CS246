@@ -1,7 +1,0 @@
-[
-    {
-        "command": "c++ -c -I/home/ardavan/Dev/CS246/assignment2/problem2/. -o CMakeFiles/pqueue.dir/nostaticexits.cpp.o /home/ardavan/Dev/CS246/assignment2/problem2/nostaticexits.cpp",
-        "directory": "/home/ardavan/Dev/CS246/assignment2/problem2",
-        "file": "/home/ardavan/Dev/CS246/assignment2/problem2/nostaticexits.cpp"
-    }
-]
