@@ -1,1 +1,0 @@
-/usr/bin/c++    -rdynamic CMakeFiles/pqueue.dir/nostaticexits.cpp.o  -o pqueue 
