@@ -82,6 +82,9 @@ PpmImage *read_ppm() {
   } catch (std::bad_alloc &err) {
     std::cerr << "allocation error, exiting" << std::endl;
     exit(EXIT_FAILURE);
+  } catch (const char *message) {
+    std::cerr << "invalid P6 format" << std::endl;
+    exit(EXIT_FAILURE);
   } catch (...) {
     if (completed) {
       return return_file;
