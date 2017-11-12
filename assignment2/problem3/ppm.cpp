@@ -15,20 +15,20 @@ struct PpmImage {
 };
 
 int main(int argc, char const *argv[]) {
-  short tran = 0;
-  short vertical = 0;
-  //  short grey_scale = 0;
+  bool grey = false;
+  PpmImage *image = read_ppm();
   for (int i = 1; i < argc; ++i) {
     try {
       const string option(argv[i]);
       if (option == "-v") {
-        ++vertical;
-        vertical %= 2;
+        vertical_flip(image);
       } else if (option == "-t") {
-        ++tran;
-        tran %= 2;
+        transpose(image);
       } else if (option == "-g") {
-        //        grey_scale = 1;
+        if (!grey) {
+          grey_scale(image);
+          grey = true;
+        }
       } else {
         throw "not a valid argument";
       }
@@ -37,11 +37,11 @@ int main(int argc, char const *argv[]) {
       exit(EXIT_FAILURE);
     } catch (...) {
       std::cerr << "Error handling command arguments" << std::endl;
+      exit(EXIT_FAILURE);
     }
   }
-  PpmImage *image = read_ppm();
-  grey_scale(image);
   write_ppm(image);
+  dealloc_image(image);
   return 0;
 }
 
@@ -61,8 +61,8 @@ PpmImage *read_ppm() {
     }
     std::cin >> return_file->width;
     std::cin >> return_file->height;
-    if (static_cast<int>(return_file->width) <= 1 ||
-        static_cast<int>(return_file->height) <= 1) {
+    if (static_cast<int>(return_file->width) <= 0 ||
+        static_cast<int>(return_file->height) <= 0) {
       throw "error";
     }
     std::cin >> return_file->colourmax;
@@ -72,14 +72,8 @@ PpmImage *read_ppm() {
       return_file->pixels[i] = new PpmImage::Pixel[return_file->width];
     }
     for (unsigned int i = 0; i < return_file->height; ++i) {
-      for (unsigned int j = 0; j < return_file->width; ++j) {
-        std::cin.read(reinterpret_cast<char *>(&(return_file->pixels[i][j].r)),
-                      sizeof(unsigned char));
-        std::cin.read(reinterpret_cast<char *>(&(return_file->pixels[i][j].g)),
-                      sizeof(unsigned char));
-        std::cin.read(reinterpret_cast<char *>(&(return_file->pixels[i][j].b)),
-                      sizeof(unsigned char));
-      }
+      std::cin.read(reinterpret_cast<char *>(return_file->pixels[i]),
+                    return_file->width * sizeof(PpmImage::Pixel));
     }
     completed = true;
     char useless = 0;
@@ -92,8 +86,8 @@ PpmImage *read_ppm() {
     if (completed) {
       return return_file;
     }
-    // cleanup
-    throw "I/O error, format of the file does not match a P6 PPM";
+    std::cerr << "invalid P6 format" << std::endl;
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -168,13 +162,16 @@ void write_ppm(PpmImage *image) {
   std::cout << image->width << " " << image->height;
   std::cout << " " << image->colourmax << std::endl;
   for (unsigned int i = 0; i < image->height; ++i) {
-    for (unsigned int j = 0; j < image->width; ++j) {
-      std::cout.write(reinterpret_cast<char *>(&(image->pixels[i][j].r)),
-                      sizeof(unsigned char));
-      std::cout.write(reinterpret_cast<char *>(&(image->pixels[i][j].g)),
-                      sizeof(unsigned char));
-      std::cout.write(reinterpret_cast<char *>(&(image->pixels[i][j].b)),
-                      sizeof(unsigned char));
-    }
+    std::cout.write(reinterpret_cast<char *>(image->pixels[i]),
+                    image->width * sizeof(PpmImage::Pixel));
   }
+}
+
+// Look at header file for description
+void dealloc_image(PpmImage *image) {
+  for (unsigned int i = 0; i < image->height; ++i) {
+    delete[] image->pixels[i];
+  }
+  delete[] image->pixels;
+  delete image;
 }

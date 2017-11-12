@@ -50,3 +50,7 @@ void grey_scale(PpmImage *image);
 // exception_handling: safe
 void write_ppm(PpmImage *image);
 
+// dealloc_image(image) deallocates the image
+// effects: deallocates the image
+// restrictions: only handles a P6 PPM
+void dealloc_image(PpmImage *image);
