@@ -17,7 +17,7 @@ struct Stack {
   Node *first;
   unsigned int len;
 };
-
+#ifndef TEST
 int main(int argc, char const *argv[]) {
   try {
     char c_string[FILENAME_MAX];
@@ -72,7 +72,7 @@ int main(int argc, char const *argv[]) {
     exit(EXIT_FAILURE);
   }
 }
-
+#endif
 // Look at header for description
 Stack *allocate_stack() {
   try {
@@ -274,6 +274,7 @@ void process_one_file(std::istream &in, std::ostream &out, Stack *stack,
       std::ifstream file(include.c_str());
       std::istream &next_in = file;
       string next_dir = include.substr(0, last_slash);
+      chdir(next_dir.c_str());
       process_one_file(next_in, out, stack, next_dir);
       chdir(prefix.c_str());
       out << std::endl;

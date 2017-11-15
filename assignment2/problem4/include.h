@@ -1,4 +1,3 @@
-//#include "  include.cpp"
 #ifndef _STRING_
 #define _STRING_
 #include <string>
@@ -50,7 +49,7 @@ std::string pop_stack(Stack *stack);
 
 // show_stack(stack) returns the first value in the stack
 // complexity: O(1)
-// requires: stack is allocated and len > 1
+// requires: stack is allocated 
 // exception_handling: in case of error terminates
 std::string show_stack(Stack *stack);
 
