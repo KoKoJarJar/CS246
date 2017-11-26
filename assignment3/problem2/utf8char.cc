@@ -88,6 +88,7 @@ bool is_valid_utf8(const Character &ch, const wchar_t &val) {
 
 // look at header for description
 wchar_t read(std::istream &infile, Character &ch) {
+  ch.length = 0;
   unsigned int length = 0;
   for (unsigned int i = 0;; ++i) {
     infile.read(reinterpret_cast<char *>(&ch.data[i].ch), sizeof(unsigned char));
