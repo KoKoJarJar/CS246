@@ -5,8 +5,10 @@
 #include <iostream>
 #include <sstream>
 
+// look at header for description
 utf8::string::string() : chars(nullptr), length(0), capacity(0){};
 
+// look at header for description
 utf8::string::string(const string &str)
     : chars(nullptr), length(str.length), capacity(str.capacity) {
   if (capacity == 0) {
@@ -16,6 +18,7 @@ utf8::string::string(const string &str)
   std::memcpy(chars, str.chars, sizeof(Character) * length);
 }
 
+// look at header for description
 utf8::string::string(const char *str) : utf8::string() {
   if (str == nullptr) {
     throw UTF8err("constructor called with null");
@@ -37,6 +40,7 @@ utf8::string::string(const char *str) : utf8::string() {
   }
 }
 
+// look at header for description
 utf8::string::~string() {
   if (capacity == 0) {
     return;
@@ -44,6 +48,7 @@ utf8::string::~string() {
   delete[] chars;
 }
 
+// look at header for description
 utf8::string &utf8::string::operator=(const string &string) {
   utf8::string temp(string);
   std::swap(length, temp.length);
@@ -52,14 +57,16 @@ utf8::string &utf8::string::operator=(const string &string) {
   return *this;
 }
 
+// look at header for description
 void utf8::string::push_back(Character ch) {
   if (length == capacity) {
-  this->reserve(2 * capacity);
+    this->reserve(2 * capacity);
   }
   chars[length] = ch;
   ++length;
 }
 
+// look at header for description
 void utf8::string::reserve(unsigned int n) {
   static const unsigned short min_allocation = 4;
   if (n < capacity) {
@@ -67,7 +74,7 @@ void utf8::string::reserve(unsigned int n) {
   }
   bool new_array = capacity == 0 ? true : false;
   if (new_array) {
-    capacity = static_cast<unsigned int>(min_allocation);
+    capacity = n > min_allocation ? n : min_allocation;
     chars = new Character[capacity];
     return;
   }
@@ -78,6 +85,7 @@ void utf8::string::reserve(unsigned int n) {
   delete[] temp;
 }
 
+// look at header for description
 utf8::string operator+(const utf8::string &str1, const utf8::string &str2) {
   utf8::string return_value(str1);
   return_value.reserve(str1.length + str2.length);
@@ -88,6 +96,9 @@ utf8::string operator+(const utf8::string &str1, const utf8::string &str2) {
   return return_value;
 }
 
+// <<(outfile, ch) outputs the character ch to outfile and returns outfile
+// effects: I/O
+// complexity: I/O 
 std::ostream &operator<<(std::ostream &outfile, const Character &ch) {
   unsigned char output[5];
   for (unsigned int i = 0; i < ch.length; ++i) {
@@ -98,6 +109,7 @@ std::ostream &operator<<(std::ostream &outfile, const Character &ch) {
   return outfile;
 }
 
+// look at header for description
 std::ostream &operator<<(std::ostream &outfile, const utf8::string &str) {
   for (unsigned int i = 0; i < str.length; ++i) {
     outfile << str.chars[i];
@@ -105,6 +117,11 @@ std::ostream &operator<<(std::ostream &outfile, const utf8::string &str) {
   return outfile;
 }
 
+// >>(infile, ch) attempts to read a utf8 encoded char from infile to ch
+// and returns infile
+// effects: I/O
+// complexity: I/O
+// requires: infile must be a utf8 encoded stream
 std::istream &operator>>(std::istream &infile, Character &ch) {
   try {
     read(infile, ch);
@@ -114,18 +131,17 @@ std::istream &operator>>(std::istream &infile, Character &ch) {
   return infile;
 }
 
+// look at header for description
 std::istream &operator>>(std::istream &infile, utf8::string &str) {
   str = utf8::string();
+  Character ch;
   for (unsigned int i = 0;; ++i) {
-    if (str.length == str.capacity) {
-      str.reserve(2 * str.capacity);
-    }
     infile >> std::ws;
     if (infile.eof()) {
       break;
     }
-    infile >> str.chars[i];
-    ++str.length;
+    infile >> ch;
+    str.push_back(ch);
     int test = infile.peek();
     if (test == EOF || isspace(test)) {
       break;
