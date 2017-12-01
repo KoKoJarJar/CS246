@@ -1,0 +1,595 @@
+#ifndef _STRING_
+#include <string>
+#define _STRING_
+#endif
+
+// ppmimage holds the data to a ppm image
+struct PpmImage;
+
+// read_ppm() return a structure holding the data to a 
+// ppm image after reading the file
+// effects: image is created and allocated (caller must free)
+// complexity: I/O + O(mn) where m is the number of columns and
+// n is the number of rows
+// restrictions: only handles a P6 PPM
+// exception_handling: throws exception of type const char * and cleans up
+// in case of allocation error, exits the program
+PpmImage *read_ppm();
+
+// allocate_image() allocates and initializes a PpmImage 
+// structure
+// effects: image is created and allocated (caller must free)
+// exception_handling: exits the program in case of bad_alloc
+PpmImage *allocate_image();
+
+// vertical_flip(image) transforms the image by doing a vertical flip
+// effects: modifies image
+// complexity: O(n) where n is the height of the image 
+// restrictions: only handles a P6 PPM
+// exception_handling: safe
+void vertical_flip(PpmImage *image);
+
+// transpose(image) transforms the image by doing a transpose
+// effects: modifies image
+// complexity: O(mn) where m and n are the width and height of the image
+// restrictions: only handles a P6 PPM
+// exception_handling: safe
+void transpose(PpmImage *image);
+
+
+// grey_scale(image) transforms the image by doing a grey_scale transformation
+// effects: modifies image
+// complexity: O(mn) where m and n are the width and height of the image
+// restrictions: only handles a P6 PPM
+// exception_handling: safe
+void grey_scale(PpmImage *image);
+
+// write_ppm(image) writes the ppm file to stdout
+// complexity: I/O + O(mn) as read_ppm
+// restrictions: only handles a P6 PPm
+// exception_handling: safe
+void write_ppm(PpmImage *image);
+
+// dealloc_image(image) deallocates the image
+// effects: deallocates the image
+// restrictions: only handles a P6 PPM
+void dealloc_image(PpmImage *image);
+
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <string>
+
+using std::string;
+
+struct PpmImage {
+  struct Pixel {
+    unsigned char r, g, b;
+  };
+  unsigned int width, height, colourmax;
+  Pixel **pixels;
+};
+
+int main(int argc, char const *argv[]) {
+  bool grey = false;
+  PpmImage *image = read_ppm();
+  for (int i = 1; i < argc; ++i) {
+    try {
+      const string option(argv[i]);
+      if (option == "-v") {
+        vertical_flip(image);
+      } else if (option == "-t") {
+        transpose(image);
+      } else if (option == "-g") {
+        if (!grey) {
+          grey_scale(image);
+          grey = true;
+        }
+      } else {
+        throw "not a valid argument";
+      }
+    } catch (const char *message) {
+      std::cerr << argv[i] << " " << message << std::endl;
+      exit(EXIT_FAILURE);
+    } catch (...) {
+      std::cerr << "Error handling command arguments" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+  write_ppm(image);
+  dealloc_image(image);
+  return 0;
+}
+
+// Look at header file for description
+PpmImage *read_ppm() {
+  std::cout.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+  std::cerr.exceptions(std::ofstream::failbit | std::ofstream::badbit);
+  std::cin.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  bool completed = false;
+  PpmImage *return_file = nullptr;
+  try {
+    return_file = allocate_image();
+    string name;
+    std::cin >> name;
+    if (name != "P6") {
+      throw "error";
+    }
+    std::cin >> return_file->width;
+    std::cin >> return_file->height;
+    if (static_cast<int>(return_file->width) <= 0 ||
+        static_cast<int>(return_file->height) <= 0) {
+      throw "error";
+    }
+    std::cin >> return_file->colourmax;
+    std::cin.ignore(1);
+    return_file->pixels = new PpmImage::Pixel *[return_file->height];
+    for (unsigned int i = 0; i < return_file->height; ++i) {
+      return_file->pixels[i] = new PpmImage::Pixel[return_file->width];
+    }
+    for (unsigned int i = 0; i < return_file->height; ++i) {
+      std::cin.read(reinterpret_cast<char *>(return_file->pixels[i]),
+                    return_file->width * sizeof(PpmImage::Pixel));
+    }
+    completed = true;
+    char useless = 0;
+    std::cin.read(&useless, sizeof(char));
+    throw "error";
+  } catch (std::bad_alloc &err) {
+    std::cerr << "allocation error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (const char *message) {
+    std::cerr << "invalid P6 format" << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    if (completed) {
+      return return_file;
+    }
+    std::cerr << "invalid P6 format" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header file for description
+PpmImage *allocate_image() {
+  PpmImage *return_file = nullptr;
+  try {
+    return_file = new PpmImage;
+    return_file->width = 0;
+    return_file->height = 0;
+    return_file->colourmax = 0;
+    return_file->pixels = nullptr;
+    return return_file;
+  } catch (...) {
+    std::cerr << "allocation error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header file for description
+void vertical_flip(PpmImage *image) {
+  for (unsigned int i = 0; i < image->height / 2; ++i) {
+    PpmImage::Pixel *temp = image->pixels[i];
+    image->pixels[i] = image->pixels[image->height - 1 - i];
+    image->pixels[image->height - 1 - i] = temp;
+  }
+}
+
+// Look at header file for description
+void transpose(PpmImage *image) {
+  try {
+    unsigned int temp = image->height;
+    image->height = image->width;
+    image->width = temp;
+    PpmImage::Pixel **temp_pixels = image->pixels;
+    image->pixels = new PpmImage::Pixel *[image->height];
+    for (unsigned int i = 0; i < image->height; ++i) {
+      image->pixels[i] = new PpmImage::Pixel[image->width];
+    }
+    for (unsigned int i = 0; i < image->height; ++i) {
+      for (unsigned int j = 0; j < image->width; ++j) {
+        image->pixels[i][j] = temp_pixels[j][i];
+      }
+    }
+    for (unsigned int i = 0; i < image->width; ++i) {
+      delete[] temp_pixels[i];
+    }
+    delete[] temp_pixels;
+  } catch (...) {
+    std::cerr << "allocation error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header file for description
+void grey_scale(PpmImage *image) {
+  for (unsigned int i = 0; i < image->height; ++i) {
+    for (unsigned int j = 0; j < image->width; ++j) {
+      unsigned char average = image->pixels[i][j].r / 3 +
+                              image->pixels[i][j].g / 3 +
+                              image->pixels[i][j].b / 3;
+      image->pixels[i][j].b = average;
+      image->pixels[i][j].g = average;
+      image->pixels[i][j].r = average;
+    }
+  }
+}
+
+// Look at header file for description
+void write_ppm(PpmImage *image) {
+  std::cout << "P6 ";
+  std::cout << image->width << " " << image->height;
+  std::cout << " " << image->colourmax << std::endl;
+  for (unsigned int i = 0; i < image->height; ++i) {
+    std::cout.write(reinterpret_cast<char *>(image->pixels[i]),
+                    image->width * sizeof(PpmImage::Pixel));
+  }
+}
+
+// Look at header file for description
+void dealloc_image(PpmImage *image) {
+  for (unsigned int i = 0; i < image->height; ++i) {
+    delete[] image->pixels[i];
+  }
+  delete[] image->pixels;
+  delete image;
+}
+
+#ifndef _STRING_
+#define _STRING_
+#include <string>
+#endif /* end of include guard */
+#ifndef _FSTREAM_
+#define _FSTREAM_
+#include <fstream>
+#endif /* end of include guard */
+#ifndef _IOSTREAM_
+#define _IOSTREAM_
+#include <iostream>
+#endif /* end of include guard */
+
+// stack ADT
+struct Stack;
+
+// allocate_stack() allocates and reutrns a stack ADT pointer
+// effects: allocates memory, caller has to free
+// complexity: O(1)
+// exception_handling: in case of bad_alloc terminates
+Stack *allocate_stack();
+
+// destroy_stack(stack) frees the memory from stack
+// effects: frees memory
+// complexity: O(n) where n is the length of stack
+// requires: stack not null
+// exception_handling: in case of bad_alloc or stack null terminates
+void destroy_stack(Stack *stack);
+
+// add_stack(filename, stack) adds filename to stack
+// effects: allocates more memory
+// complexity: O(m) where m is the length of filename
+// requires: stack is allocated
+// exception_handling: in case of bad_alloc or stack null terminates
+void add_stack(std::string filename, Stack *stack);
+
+// search_stack(filename, stack) searches for filename in stack
+// complexity: O(nm) where n is the length of stack and m length of filename
+// requires: stack is allocated
+// exception_handling: in case of error terminates
+bool search_stack(std::string filename, Stack *stack);
+
+// pop_stack(stack) pops the first entry in the stack and returns the value
+// effects: modifies the stack
+// complexity: O(1)
+// requires: stack is allocated and len > 1
+// exception_handling: in case of error terminates
+std::string pop_stack(Stack *stack);
+
+// show_stack(stack) returns the first value in the stack
+// complexity: O(1)
+// requires: stack is allocated 
+// exception_handling: in case of error terminates
+std::string show_stack(Stack *stack);
+
+// process_one_file(in, out, stack, prefix) recursively opens include files
+// from in and copies them in out (acting like a pre-processor)
+// effects: modifies stack and prefix
+// complexity: O(n) where n is the number of include files + I/O
+// exception_handling: in case of error terminates
+void process_one_file(std::istream &in, std::ostream &out, Stack *stack, std::string prefix);
+
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <unistd.h>
+
+using std::string;
+
+struct Node {
+  string filename;
+  Node *link;
+};
+
+struct Stack {
+  Node *first;
+  unsigned int len;
+};
+#ifndef TEST
+int main(int argc, char const *argv[]) {
+  try {
+    char c_string[FILENAME_MAX];
+    string prefix;
+    std::istream *infile = &std::cin;
+    std::ostream *outfile = &std::cout;
+    Stack *stack = allocate_stack();
+    switch (argc) {
+    case 3:
+      if (realpath(argv[2], c_string) == nullptr) {
+        throw "output file does not exist";
+      }
+      outfile = new std::ofstream(c_string);
+    case 2: {
+      if (realpath(argv[1], c_string) == nullptr) {
+        throw "input file does not exist";
+      }
+      prefix = c_string;
+      add_stack(prefix, stack);
+      infile = new std::ifstream(c_string);
+      string::size_type last_slash = prefix.find_last_of('/');
+      prefix = prefix.substr(0, last_slash);
+    }
+    case 1:
+      break;
+    default:
+      throw "wrong command arguments";
+    }
+    if (infile == &std::cin) {
+      realpath(".", c_string);
+      prefix = c_string;
+    }
+    std::istream &in = *infile;
+    std::ostream &out = *outfile;
+    chdir(prefix.c_str());
+    process_one_file(in, out, stack, prefix);
+    destroy_stack(stack);
+    if (outfile != &std::cout) {
+      delete outfile;
+    }
+    if (infile != &std::cin) {
+      delete infile;
+    }
+    return 0;
+  } catch (const char *err) {
+    std::cerr << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (std::bad_alloc &err) {
+    std::cerr << "not enough memory" << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    exit(EXIT_FAILURE);
+  }
+}
+#endif
+// Look at header for description
+Stack *allocate_stack() {
+  try {
+    auto stack = new Stack;
+    stack->len = 0;
+    stack->first = nullptr;
+    return stack;
+  } catch (...) {
+    std::cout << "insufficient memory, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+void destroy_stack(Stack *stack) {
+  try {
+    if (stack == nullptr) {
+      throw "stack not allocated";
+    }
+    Node *temp_node = stack->first;
+    for (unsigned int i = 0; i < stack->len; ++i) {
+      Node *temp_node2 = temp_node->link;
+      delete temp_node;
+      temp_node = temp_node2;
+    }
+    temp_node = nullptr;
+    delete stack;
+  } catch (const char *err) {
+    std::cout << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    std::cout << "deallocation error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+void add_stack(string filename, Stack *stack) {
+  try {
+    if (stack == nullptr) {
+      throw "stack not allocated";
+    }
+    auto new_node = new Node;
+    new_node->filename = filename;
+    new_node->link = stack->first;
+    stack->first = new_node;
+    ++stack->len;
+  } catch (const char *err) {
+    std::cout << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    std::cout << "insufficient memory, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+bool search_stack(string filename, Stack *stack) {
+  try {
+    if (stack == nullptr) {
+      throw "stack not allocated";
+    }
+    Node *first = stack->first;
+    for (unsigned int i = 0; i < stack->len; ++i) {
+      if (first->filename == filename) {
+        return true;
+      }
+        first = first->link;
+    }
+    return false;
+  } catch (const char *err) {
+    std::cout << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    std::cout << "unknown error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+string pop_stack(Stack *stack) {
+  try {
+    if (stack == nullptr) {
+      throw "stack not allocated, exiting";
+    }
+    if (stack->len < 1) {
+      throw "stack empty, exiting";
+    }
+    --stack->len;
+    string return_string = stack->first->filename;
+    Node *temp_node = stack->first;
+    stack->first = stack->first->link;
+    delete temp_node;
+    return return_string;
+  } catch (const char *err) {
+    std::cerr << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    std::cerr << "unknown error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+string show_stack(Stack *stack) {
+  try {
+    if (stack == nullptr) {
+      throw "stack not allocated, exiting";
+    }
+    if (stack->len < 1) {
+      return "empty";
+    }
+    return stack->first->filename;
+  } catch (const char *err) {
+    exit(EXIT_FAILURE);
+    std::cerr << err << std::endl;
+  } catch (...) {
+    std::cerr << "unknown error, exiting" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// is_user_include(line, include) checks to see if line is of type
+// user_include, also returns the string for the include file if it exists
+// effects: changes include
+// complexity: O(m) where m is the length of line
+// restrictions: line is a valid string
+static bool is_user_include(string line, string &include) {
+  static char buffer[FILENAME_MAX];
+  static unsigned short include_length = 7;
+  try {
+    std::stringstream ss(line);
+    ss.exceptions(std::ios_base::failbit | std::ios_base::badbit);
+    ss >> std::ws;
+    ss.read(buffer, sizeof(char));
+    string check(buffer);
+    check.resize(1);
+    if (check != "#") {
+      return false;
+    }
+    ss >> std::ws;
+    ss.read(buffer, include_length * sizeof(char));
+    check = buffer;
+    check.resize(include_length);
+    if (check != "include") {
+      return false;
+    }
+    ss >> std::ws;
+    ss.read(buffer, sizeof(char));
+    check = buffer;
+    check.resize(1);
+    if (check != "\"") {
+      return false;
+    }
+    ss >> std::ws;
+    std::getline(ss, check, '"');
+    string::size_type first_ws = check.find_first_of(" \n\t\r\v\f");
+    if (first_ws != string::npos) {
+      check = check.substr(0, first_ws);
+    }
+    ss >> std::ws;
+    if (!ss.eof()) {
+      return false;
+    }
+    include = check;
+    return true;
+  } catch (std::ios_base::failure &err) {
+    return false;
+  } catch (...) {
+    std::cerr << "unknown error" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
+
+// Look at header for description
+void process_one_file(std::istream &in, std::ostream &out, Stack *stack,
+                      std::string prefix) {
+  static char buffer2[FILENAME_MAX];
+  try {
+    string line;
+    string check;
+    string &include = check;
+    while (std::getline(in, line) && !in.fail()) {
+      if (!is_user_include(line, include)) {
+        break;
+      }
+      std::cerr << include << std::endl;
+      if (realpath(include.c_str(), buffer2) == nullptr) {
+        throw "invalid file name";
+      }
+      include = buffer2;
+      if (search_stack(include, stack)) {
+        throw "recursive inclusion";
+      }
+      add_stack(include, stack);
+      string::size_type last_slash = include.find_last_of("/");
+      if (last_slash == string::npos) {
+        throw "wrong file name";
+      }
+      std::ifstream file(include.c_str());
+      std::istream &next_in = file;
+      string next_dir = include.substr(0, last_slash);
+      chdir(next_dir.c_str());
+      process_one_file(next_in, out, stack, next_dir);
+      chdir(prefix.c_str());
+      out << std::endl;
+      pop_stack(stack);
+      file.close();
+    }
+    while (!in.fail()) {
+      out << line << std::endl;
+      std::getline(in, line);
+    }
+    return;
+  } catch (const char *err) {
+    std::cerr << err << std::endl;
+    exit(EXIT_FAILURE);
+  } catch (...) {
+    std::cerr << "unknown I/O error" << std::endl;
+    exit(EXIT_FAILURE);
+  }
+}
