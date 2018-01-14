@@ -25,10 +25,13 @@ int main() {
       Expression &second = *(stack.top());
       stack.pop();
       stack.push(new Binary(first, second, input));
+      delete &first;
+      delete &second;
     } else {
       Expression &first = *(stack.top());
       stack.pop();
       stack.push(new Unary(first, input));
+      delete &first;
     }
     std::cin >> input;
   }

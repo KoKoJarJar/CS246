@@ -1,8 +1,11 @@
 #include "error.h"
 #include "unary.h"
 #include <iostream>
+#include <math.h>
+#include <memory>
+#include <utility>
 
-Unary::Unary(Expression &exp, std::string string) : operation(false), prev(&exp) {
+Unary::Unary(Expression &exp, std::string string) : operation(false), prev(std::move(exp.copy())) {
   if (string == "NEG") {
     operation = false;
   } else if (string == "ABS") {
@@ -12,10 +15,14 @@ Unary::Unary(Expression &exp, std::string string) : operation(false), prev(&exp)
   }
 }
 
-Unary::Unary() : operation(false), prev(nullptr) {};
+Unary::Unary() : operation(false), prev(nullptr){};
 
 int Unary::evaluate() {
-  return (prev.get())->evaluate();
+  const int value = prev.get()->evaluate();
+  if (operation == true) {
+    return value >= 0 ? value : -value;
+  }
+  return -value;
 }
 
 void Unary::prettyprint() {
@@ -24,8 +31,15 @@ void Unary::prettyprint() {
     (prev.get())->prettyprint();
     std::cout << "|";
     return;
-  } 
+  }
   std::cout << "-(";
   (prev.get())->prettyprint();
   std::cout << ")";
+}
+
+Unary::Unary(const Unary &expr)
+    : operation(expr.operation), prev(std::move(expr.prev.get()->copy())){};
+
+std::unique_ptr<Expression> Unary::copy() {
+  return std::unique_ptr<Expression>(new Unary(*this));
 }

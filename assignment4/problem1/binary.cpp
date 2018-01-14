@@ -1,12 +1,14 @@
 #include "binary.h"
 #include "error.h"
 #include <iostream>
+#include <memory>
 #include <string>
+#include <utility>
 
 Binary::Binary() : left(nullptr), right(nullptr), operation(5){};
 
-Binary::Binary(Expression &left_val, Expression &right_val, std::string string)
-    : left(&left_val), right(&right_val), operation(5) {
+Binary::Binary(Expression &left_val, Expression &right_val, std::string &string)
+    : left(std::move(left_val.copy())), right(std::move(right_val.copy())), operation(5) {
   if (string == "+") {
     operation = 0;
   } else if (string == "*") {
@@ -50,4 +52,12 @@ void Binary::prettyprint() {
   }
   (right.get())->prettyprint();
   std::cout << ")";
+}
+
+Binary::Binary(const Binary &expr)
+    : left(std::move(expr.left.get()->copy())), right(std::move(expr.right.get()->copy())),
+      operation(expr.operation){};
+
+std::unique_ptr<Expression> Binary::copy() {
+  return std::unique_ptr<Expression> (new Binary(*this));
 }

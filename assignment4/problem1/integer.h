@@ -12,6 +12,7 @@ public:
   Integer_expression();
   int evaluate();
   void prettyprint();
+  std::unique_ptr<Expression> copy();
 };
 
 #endif
