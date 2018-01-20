@@ -5,7 +5,7 @@
 #include <string>
 #include <utility>
 
-Binary::Binary() : left(nullptr), right(nullptr), operation(5){};
+Binary::Binary() : left(nullptr), right(nullptr), operation(5){}
 
 Binary::Binary(Expression &left_val, Expression &right_val, std::string &string)
     : left(std::move(left_val.copy())), right(std::move(right_val.copy())), operation(5) {
@@ -56,7 +56,7 @@ void Binary::prettyprint() {
 
 Binary::Binary(const Binary &expr)
     : left(std::move(expr.left.get()->copy())), right(std::move(expr.right.get()->copy())),
-      operation(expr.operation){};
+      operation(expr.operation){}
 
 std::unique_ptr<Expression> Binary::copy() {
   return std::unique_ptr<Expression> (new Binary(*this));

@@ -1,3 +1,3 @@
 #include "error.h"
 
-Error::Error(std::string string) : message(string){};
+Error::Error(std::string string) : message(string){}

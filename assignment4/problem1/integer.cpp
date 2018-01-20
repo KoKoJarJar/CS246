@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 
-Integer_expression::Integer_expression(){};
+Integer_expression::Integer_expression(){}
 
 Integer_expression::Integer_expression(int value) {
   this->value = value;

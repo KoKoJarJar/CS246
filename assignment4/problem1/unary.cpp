@@ -15,7 +15,7 @@ Unary::Unary(Expression &exp, std::string string) : operation(false), prev(std::
   }
 }
 
-Unary::Unary() : operation(false), prev(nullptr){};
+Unary::Unary() : operation(false), prev(nullptr){}
 
 int Unary::evaluate() {
   const int value = prev.get()->evaluate();
@@ -38,7 +38,7 @@ void Unary::prettyprint() {
 }
 
 Unary::Unary(const Unary &expr)
-    : operation(expr.operation), prev(std::move(expr.prev.get()->copy())){};
+    : operation(expr.operation), prev(std::move(expr.prev.get()->copy())){}
 
 std::unique_ptr<Expression> Unary::copy() {
   return std::unique_ptr<Expression>(new Unary(*this));
