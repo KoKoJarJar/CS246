@@ -1,11 +1,15 @@
+#ifndef __PRINTER_CONCR__
+#define __PRINTER_CONCR__
+
 #include "game.h"
 #include "printer.h"
-#include <vector>
 
-class Printer_concr {
-  Game &game;
+class Printer_concr : public Printer {
+  Game *game;
 
 public:
-  Printer_concr(Game &game);
+  void add_game(Game &game);
   void print();
 };
+
+#endif

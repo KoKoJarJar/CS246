@@ -2,16 +2,19 @@
 #include <memory>
 #include <vector>
 
-Game_concr::Game_concr(vector<Cell> &grid, const unsigned int difficulty = 25)
-    : grid(grid), moves(25){};
+Game_concr::Game_concr(std::vector<Cell *> &grid, Printer &printer, const unsigned int difficulty,
+                       const unsigned int number)
+    : grid(&grid), printer(printer), moves(difficulty), number(number) {
+}
 
-std::vector<Cell> &Game_concr::get_cell() {
-  return grid.get();
+std::vector<Cell *> &Game_concr::get_cell() {
+  return *(grid.get());
 }
 
 void Game_concr::set(State &state) {
-  grid.at(0).update(state);
+  grid.get()->at(0)->update(state);
   printer.print();
+  --moves;
 }
 
 bool Game_concr::finished() {
@@ -19,9 +22,10 @@ bool Game_concr::finished() {
 }
 
 bool Game_concr::won() {
-  State temp_state = grid.at(0).state();
-  for (auto v : grid) {
-    if (temp_state.get_state() != v.state().get_state()) {
+  std::vector<Cell *> &temp = *(grid.get());
+  Cell &temp_state = *(temp.at(0));
+  for (auto &&v : temp) {
+    if (temp_state != *v) {
       return false;
     }
   }
@@ -32,6 +36,6 @@ unsigned int Game_concr::moves_left() {
   return moves;
 }
 
-unsigned int size() {
-  return size;
+unsigned int Game_concr::size() {
+  return number;
 }

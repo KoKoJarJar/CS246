@@ -1,10 +1,13 @@
+#ifndef __GAME__
+#define __GAME__
+
 #include "cell.h"
 #include "publisher.h"
 #include <vector>
 
 class Game {
 public:
-  virtual std::vector<Cell> &get_cell() = 0;
+  virtual std::vector<Cell *> &get_cell() = 0;
   virtual void set(State &state) = 0;
   virtual bool finished() = 0;
   virtual bool won() = 0;
@@ -12,3 +15,5 @@ public:
   virtual unsigned int size() = 0;
   virtual ~Game(){};
 };
+
+#endif
