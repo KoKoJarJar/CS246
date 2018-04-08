@@ -1,8 +1,9 @@
 #include "game_concr.h"
 #include "grid.h"
 
-Game_concr::Game_concr(Grid *grid, Propagator *propagator) : grid(grid), propagator(propagator) {
-  if (grid == nullptr || propagator == nullptr) {
+Game_concr::Game_concr(Grid *grid, Propagator *propagator, unsigned int moves_left)
+    : grid(grid), propagator(propagator), moves_left_prv(moves_left) {
+  if (grid == nullptr || propagator == nullptr || moves_left <= 0) {
     throw "error";
   }
 }

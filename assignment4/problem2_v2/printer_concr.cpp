@@ -6,5 +6,5 @@ Printer_concr::Printer_concr() {
 }
 
 void Printer_concr::print(const Game &game, std::ostream &out) {
-  out << game;
+  out << game << std::endl;
 }

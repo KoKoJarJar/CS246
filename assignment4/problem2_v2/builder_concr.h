@@ -8,8 +8,10 @@
 #include "printer.h"
 #include "propagator.h"
 
+// see builder.h for description
 class Builder_concr : public Builder {
 public:
+  // Constructor
   Builder_concr();
   Cell *build_cell(unsigned int value) const;
   Grid *build_grid(unsigned int size, unsigned int max_state) const;
